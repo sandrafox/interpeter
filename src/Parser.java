@@ -14,17 +14,38 @@ public class Parser {
     private Expression expression() {
         Token token = analyzer.getCurToken();
         switch (token) {
-            case CLOSEP:
-                analyzer.nextToken();
-                Expression e1 = expression();
-                Token oper = analyzer.getCurToken();
-                analyzer.nextToken();
-                Expression e2 = expression();
-                analyzer.nextToken();
-                return new BinaryExpression(e1, oper, e2);
+            case OPENP:
+                return binaryExpression();
+            case LBRACKET:
+                return ifExpression();
             default:
                 return constExpression();
         }
+    }
+
+    private IfExpression ifExpression() {
+        analyzer.nextToken();
+        Expression e1 = expression();
+        analyzer.nextToken(); //]?(
+        analyzer.nextToken();
+        analyzer.nextToken();
+        Expression e2 = expression();
+        analyzer.nextToken();
+        analyzer.nextToken();
+        analyzer.nextToken();
+        Expression e3 = expression();
+        analyzer.nextToken();
+        return new IfExpression(e1, e2, e3);
+    }
+
+    private BinaryExpression binaryExpression() {
+        analyzer.nextToken();
+        Expression e1 = expression();
+        Token oper = analyzer.getCurToken();
+        analyzer.nextToken();
+        Expression e2 = expression();
+        analyzer.nextToken();
+        return new BinaryExpression(e1, oper, e2);
     }
 
     private Const constExpression() {
@@ -35,6 +56,7 @@ public class Parser {
             analyzer.nextToken();
         }
         value *= Integer.parseInt(analyzer.getCurString());
+        analyzer.nextToken();
         return new Const(value);
     }
 }
