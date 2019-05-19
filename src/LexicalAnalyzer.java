@@ -47,6 +47,18 @@ public class LexicalAnalyzer {
                 nextChar();
                 curToken = Token.MOD;
                 break;
+            case '>':
+                nextChar();
+                curToken = Token.GT;
+                break;
+            case '<':
+                nextChar();
+                curToken = Token.LT;
+                break;
+            case '=':
+                nextChar();
+                curToken = Token.EQ;
+                break;
             default:
                 if (Character.isDigit(curChar)) {
                     nextChar();

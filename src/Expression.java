@@ -1,5 +1,3 @@
-public class Expression {
-    private Expression left;
-    private Expression right;
-
+public interface Expression {
+    public int evaluate();
 }
