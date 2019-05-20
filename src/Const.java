@@ -1,3 +1,5 @@
+import java.util.Map;
+
 public class Const implements Expression {
     private int result;
 
@@ -5,7 +7,7 @@ public class Const implements Expression {
         result = value;
     }
 
-    public int evaluate() {
+    public int evaluate(Map<String, Integer> vars) {
         return result;
     }
 }

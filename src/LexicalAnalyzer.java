@@ -5,7 +5,7 @@ public class LexicalAnalyzer {
     private String s;
     private int curPos;
 
-    public LexicalAnalyzer (String is) {
+    public void analyze(String is) {
         s = is;
         curPos = -1;
         nextChar();
@@ -13,7 +13,11 @@ public class LexicalAnalyzer {
 
     private void nextChar() {
         curPos++;
-        curChar = s.charAt(curPos);
+        if (curPos >= s.length()) {
+            curChar = '$';
+        } else {
+            curChar = s.charAt(curPos);
+        }
     }
 
     public void nextToken() {
@@ -75,6 +79,23 @@ public class LexicalAnalyzer {
                 nextChar();
                 curToken = Token.COLON;
                 break;
+            case ',':
+                nextChar();
+                curToken = Token.COMMA;
+                break;
+            case '{':
+                nextChar();
+                curToken = Token.LCBRACKET;
+                break;
+            case '}':
+                nextChar();
+                curToken = Token.RCBRACKET;
+                break;
+            case '\n':
+            case '$':
+                nextChar();
+                curToken = Token.EOL;
+                break;
             default:
                 if (Character.isDigit(curChar)) {
                     nextChar();
@@ -85,7 +106,17 @@ public class LexicalAnalyzer {
                     }
                     curString = sb.toString();
                     curToken = Token.NUMBER;
+                } else if (Character.isLetter(curChar) || curChar == '_') {
+                    nextChar();
+                    StringBuilder sb = new StringBuilder(curString);
+                    while (Character.isLetter(curChar) || curChar == '_') {
+                        sb.append(curChar);
+                        nextChar();
+                    }
+                    curString = sb.toString();
+                    curToken = Token.ID;
                 }
+
 
         }
     }

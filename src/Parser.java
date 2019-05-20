@@ -1,10 +1,59 @@
+import java.util.*;
+
 public class Parser {
     private LexicalAnalyzer analyzer;
+    private Map<String, List<String>> functionList;
+    private Map<String, Expression> functionBodyList;
+    private Set<String> variables;
 
-    public Expression parse(String s) {
-        analyzer = new LexicalAnalyzer(s);
+    public Expression parse(List<String> s) {
+        analyzer = new LexicalAnalyzer();
+        if (s.size() > 1) {
+            functionDefenitionList(s.subList(0, s.size() - 1));
+        }
+        analyzer.analyze(s.get(s.size() - 1));
         analyzer.nextToken();
         return program();
+    }
+
+    private void functionDefenitionList(List<String> s) {
+        functionList = new HashMap<>();
+        functionBodyList = new HashMap<>();
+        variables = new HashSet<>();
+        for (String func : s) {
+            analyzer.analyze(func);
+            analyzer.nextToken();
+            functionDefenition();
+        }
+    }
+
+    private void functionDefenition() {
+        String name = analyzer.getCurString();
+        analyzer.nextToken();
+        analyzer.nextToken();
+        List<String> args = argsList();
+        functionList.put(name, args);
+        analyzer.nextToken();
+        analyzer.nextToken();
+        analyzer.nextToken();
+        variables.addAll(args);
+        functionBodyList.put(name, expression());
+        variables.removeAll(args);
+        analyzer.nextToken();
+    }
+
+    private List<String> argsList() {
+        List<String> args = new LinkedList<>();
+        args.add(analyzer.getCurString());
+        analyzer.nextToken();
+        Token token = analyzer.getCurToken();
+        while (token == Token.COMMA) {
+            analyzer.nextToken();
+            args.add(analyzer.getCurString());
+            analyzer.nextToken();
+            token = analyzer.getCurToken();
+        }
+        return args;
     }
 
     private Expression program() {
@@ -18,9 +67,40 @@ public class Parser {
                 return binaryExpression();
             case LBRACKET:
                 return ifExpression();
-            default:
+            case ID:
+                String name = analyzer.getCurString();
+                if (variables.contains(name)) {
+                    analyzer.nextToken();
+                    return new Variable(name);
+                }
+                return functionCall();
+            case MINUS:
+            case NUMBER:
                 return constExpression();
+            default:
+                return null;
         }
+    }
+
+    private FunctionCall functionCall() {
+        String name = analyzer.getCurString();
+        analyzer.nextToken();
+        analyzer.nextToken();
+        List<Expression> params = parametersList();
+        analyzer.nextToken();
+        return new FunctionCall(functionBodyList, functionList, params, name);
+    }
+
+    private List<Expression> parametersList() {
+        List<Expression> params = new ArrayList<>();
+        params.add(expression());
+        Token token = analyzer.getCurToken();
+        while (token == Token.COMMA) {
+            analyzer.nextToken();
+            params.add(expression());
+            token = analyzer.getCurToken();
+        }
+        return params;
     }
 
     private IfExpression ifExpression() {
