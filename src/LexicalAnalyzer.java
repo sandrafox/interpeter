@@ -20,7 +20,7 @@ public class LexicalAnalyzer {
         }
     }
 
-    public void nextToken() {
+    public void nextToken() throws ParserException {
         curString = "" + curChar;
         switch (curChar) {
             case '(':
@@ -115,9 +115,9 @@ public class LexicalAnalyzer {
                     }
                     curString = sb.toString();
                     curToken = Token.ID;
+                } else {
+                    throw new SyntaxError();
                 }
-
-
         }
     }
 

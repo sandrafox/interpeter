@@ -1,0 +1,3 @@
+g(a,b)={(a%b)}
+g(4;2)
+SYNTAX ERROR

@@ -10,4 +10,8 @@ public class Const implements Expression {
     public int evaluate(Map<String, Integer> vars) {
         return result;
     }
+
+    public String toString() {
+        return "" + result;
+    }
 }

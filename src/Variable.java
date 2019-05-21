@@ -11,4 +11,9 @@ public class Variable implements Expression {
     public int evaluate(Map<String, Integer> vars) {
         return vars.get(name);
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
